@@ -16,16 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.shortcuts import redirect
 from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-
-from tasks.views import TasksViewSet
-
-router = DefaultRouter()
-router.register(r'tasks', TasksViewSet)
 
 urlpatterns = [
-    path(r'api/', include(router.urls)),
     path(r'tasks/', include('tasks.urls', namespace='tasks')),
+    path(r'users/', include('users.urls', namespace='users')),
     path(r'admin/', admin.site.urls),
     path(r'api-auth/', include('rest_framework.urls')),
     path(r'', lambda _: redirect('tasks/'))

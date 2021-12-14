@@ -8,7 +8,7 @@
     <small class="text-muted"></small>
 </h3>
 
-<form action="/api/tasks/" method="post" class="form">
+<form action="/tasks/new/" method="post" class="form">
     {% csrf_token %}
 
     {% for field in form %}

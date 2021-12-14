@@ -1,13 +1,12 @@
 from datetime import datetime
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AnonymousUser
 from django.http import HttpResponse
+from django.shortcuts import redirect
 from django.template import loader
-from rest_framework import viewsets
 
 from tasks.forms import TaskCreateForm
 from tasks.models import TasksModel
-from tasks.serializers import TasksSerializer, CreateTaskSerializer, UpdateTaskSerializer
 
 
 def render_tasks_list(request):
@@ -29,8 +28,30 @@ def render_tasks_list(request):
 
 def render_task_form(request):
     template = loader.get_template('tasks/form.html')
+
+    if request.method != 'POST':
+        form = TaskCreateForm()
+    else:
+        form = TaskCreateForm(data=request.POST)
+        if form.is_valid():
+            task = form.save(commit=False)
+
+            # TODO: remove when resolve authorization
+            if isinstance(request.user, AnonymousUser):
+                author = User.objects.filter(groups__name='leader').first()
+            else:
+                author = request.user
+
+            task.author = author
+            task.status = TasksModel.TaskStatuses.OPEN
+            task.created_at = datetime.now()
+
+            task.save()
+
+            return redirect('tasks:all')
+
     context = {
-        'form': TaskCreateForm,
+        'form': form,
     }
     return HttpResponse(template.render(context, request))
 
@@ -42,23 +63,3 @@ def render_task_detail(request, task_id):
         'task': task,
     }
     return HttpResponse(template.render(context, request))
-
-
-class TasksViewSet(viewsets.ModelViewSet):
-    queryset = TasksModel.objects.all()
-    serializer_class = TasksSerializer
-
-    def perform_create(self, serializer):
-        serializer.save(
-            status=TasksModel.TaskStatuses.OPEN,
-            author=self.request.user,
-            created_at=datetime.now(),
-        )
-
-    def get_serializer_class(self):
-        if self.request.method == 'POST':
-            return CreateTaskSerializer
-        elif self.request.method in ['UPDATE', 'PATCH']:
-            return UpdateTaskSerializer
-        else:
-            return self.serializer_class
