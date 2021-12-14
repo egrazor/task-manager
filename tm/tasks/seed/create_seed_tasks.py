@@ -7,27 +7,50 @@ from django.contrib.auth.models import User, Group, Permission
 
 from tasks.models import TasksModel
 
-titles = [
-    'Проверить почту',
-    'Подготовить отчёт',
-    'Провести собрание',
-    'Связаться с клиентом'
+tasks = [
+    {
+        'title': 'Реализовать новый функционал в модуле Документы',
+        'description': 'Добавить возможность комментирования документов'
+    },
+    {
+        'title': 'Исправить баги в модуле Документы',
+        'description': 'Превью документа некорректно отображается на планшетах'
+    },
+    {
+        'title': 'Исправить баги в модуле Пользователи',
+        'description': 'Ошибка сервера при попытке обновить аватарку пользователя'
+    },
 ]
 
 
 def create_user_groups():
-    group_1, _ = Group.objects.get_or_create(name='employee')
+    group_1, _ = Group.objects.get_or_create(name='engineer')
     group_1.permissions.set(
-        Permission.objects.filter(codename__endswith='tasksmodel')
+        Permission.objects.filter(codename__in=[
+            'view_tasksmodel',
+            'change_tasksmodel',
+        ])
     )
 
     group_1.save()
 
-    group_2, _ = Group.objects.get_or_create(name='admin')
+    group_2, _ = Group.objects.get_or_create(name='tester')
     group_2.permissions.set(
         Permission.objects.filter(codename__in=[
             'view_tasksmodel',
             'change_tasksmodel',
+        ])
+    )
+
+    group_2.save()
+
+    group_3, _ = Group.objects.get_or_create(name='leader')
+    group_3.permissions.set(
+        Permission.objects.filter(codename__in=[
+            'create_taskmodel',
+            'view_tasksmodel',
+            'change_tasksmodel',
+            'delete_taskmodel',
         ])
     )
 
@@ -38,10 +61,10 @@ def create_base_users():
     password = make_password('password1')
 
     user_model = get_user_model()
-
-    admin_group = Group.objects.get(name='admin')
-    employee_group = Group.objects.get(name='employee')
-
+    leader_group = Group.objects.get(name='leader')
+    engineer_group = Group.objects.get(name='engineer')
+    tester_group = Group.objects.get(name='tester')
+    
     # super_user = User.objects.create_user(
     #     'admin',
     #     password=password,
@@ -52,67 +75,73 @@ def create_base_users():
     #
     # super_user.save()
 
-    admin = user_model.objects.create(
-        username='max_demax',
-        first_name='Максим',
-        last_name='Демах',
+    leader = user_model.objects.create(
+        username='kutuzov',
+        first_name='Михаил',
+        last_name='Кутузов',
         password=password,
     )
 
-    admin.groups.add(admin_group)
+    leader.groups.add(leader_group)
 
-    employee_1 = user_model.objects.create_user(
-        username='egrazor',
-        first_name='Егор',
-        last_name='Зенкин',
+    engineer_1 = user_model.objects.create_user(
+        username='bagrat',
+        first_name='Петр',
+        last_name='Багратион',
         password=password,
     )
 
-    employee_1.groups.add(employee_group)
+    engineer_1.groups.add(engineer_group)
 
-    employee_2 = user_model.objects.create_user(
-        username='zarina',
-        first_name='Зарина',
-        last_name='Каримова',
+    engineer_2 = user_model.objects.create_user(
+        username='leo',
+        first_name='Леонтий',
+        last_name='Беннигсен',
         password=password,
     )
 
-    employee_2.groups.add(employee_group)
+    engineer_2.groups.add(engineer_group)
 
-    employee_3 = user_model.objects.create_user(
-        username='zenderg',
+    engineer_3 = user_model.objects.create_user(
+        username='dan',
         first_name='Данила',
-        last_name='Кузин',
+        last_name='Поперечный',
         password=password,
     )
 
-    employee_3.groups.add(employee_group)
+    engineer_3.groups.add(engineer_group)
 
-    employee_4 = user_model.objects.create_user(
-        username='zenderg',
-        first_name='Данила',
-        last_name='Кузин',
+    tester_1 = user_model.objects.create_user(
+        username='nikolas',
+        first_name='Николай',
+        last_name='Ростов',
         password=password,
     )
 
-    employee_4.groups.add(employee_group)
+    tester_1.groups.add(tester_group)
 
-    employee_5 = user_model.objects.create_user(
-        username='ivan',
-        first_name='Иван',
-        last_name='Ерёменко',
+    tester_2 = user_model.objects.create_user(
+        username='natali',
+        first_name='Наталья',
+        last_name='Ростова',
         password=password,
     )
 
-    employee_5.groups.add(employee_group)
+    tester_2.groups.add(tester_group)
 
 
 def create_seed_tasks():
-    for employee in User.objects.filter(
-            groups__name='employee'
-    ):
+    leader = User.objects.filter(groups__name='leader').first()
+    engineers = User.objects.filter(
+        groups__name='engineer'
+    )
+
+    for task in tasks:
         TasksModel.objects.create(
-            title=random.choice(titles),
+            title=task['title'],
+            description=task['description'],
             deadline=datetime.now() + timedelta(days=random.choice(range(10))),
-            executor_id=employee.id
+            executor=random.choice(engineers),
+            author=leader,
+            created_at=datetime.now()
         )

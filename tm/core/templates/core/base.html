@@ -1,0 +1,40 @@
+{% load bootstrap5 %}
+
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'core/style.css' %}">
+
+<div class="container">
+
+    {% block nav %}
+    <div class="top">
+        <ul class="nav">
+            <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="">Все</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="open">Открытые</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="in-progress">В работе</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="completed">Выполнено</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="checked">Проверено</a>
+            </li>
+            <button type="button" class="btn btn-danger">
+                <a class="nav-link white-font" href="new">СОЗДАТЬ</a>
+            </button>
+        </ul>
+    </div>
+    {% endblock nav %}
+
+    {% block content %}
+
+    {% endblock content %}
+</div>
