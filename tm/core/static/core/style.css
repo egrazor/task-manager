@@ -1,8 +1,19 @@
-.top {
-    font-size: 24px;
-    margin: 30px 0;
-}
-
 .white-font {
     color: white;
+}
+
+.OPEN {
+    background-color: indianred;
+}
+
+.IN_PROGRESS {
+    background-color: dodgerblue;
+}
+
+.COMPLETED {
+    background-color: orange;
+}
+
+.CHECKED {
+    background-color: forestgreen;
 }

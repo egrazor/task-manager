@@ -1,6 +1,5 @@
 from datetime import datetime
 
-from django.contrib.auth.models import User
 from django.db import models
 from django.conf import settings
 
@@ -12,6 +11,12 @@ class TasksModel(models.Model):
         IN_PROGRESS = 'IN_PROGRESS'
         COMPLETED = 'COMPLETED'
         CHECKED = 'CHECKED'
+
+    class TaskStatusesRu(models.TextChoices):
+        OPEN = 'Открыто'
+        IN_PROGRESS = 'В работе'
+        COMPLETED = 'Выполнено'
+        CHECKED = 'Проверено'
 
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=100, verbose_name='задача')

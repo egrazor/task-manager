@@ -5,15 +5,23 @@ from django.http import HttpResponse
 from django.template import loader
 from rest_framework import viewsets
 
-from tasks.forms import TaskForm
+from tasks.forms import TaskCreateForm
 from tasks.models import TasksModel
 from tasks.serializers import TasksSerializer, CreateTaskSerializer, UpdateTaskSerializer
 
 
 def render_tasks_list(request):
     template = loader.get_template('tasks/list.html')
-    tasks = TasksModel.objects.all()
+    last_word = request.path.split('/')[-2]
+    if last_word == 'tasks':
+        tasks = TasksModel.objects.all()
+        title = 'Все задачи'
+    else:
+        tasks = TasksModel.objects.filter(status=last_word.upper())
+        title = f'Задачи в статусе {TasksModel.TaskStatusesRu[last_word.upper()]}'
+
     context = {
+        'title': title,
         'tasks': tasks
     }
     return HttpResponse(template.render(context, request))
@@ -21,10 +29,17 @@ def render_tasks_list(request):
 
 def render_task_form(request):
     template = loader.get_template('tasks/form.html')
-    engineers = User.objects.filter(groups__name='engineer')
     context = {
-        'engineers': engineers,
-        'form': TaskForm,
+        'form': TaskCreateForm,
+    }
+    return HttpResponse(template.render(context, request))
+
+
+def render_task_detail(request, task_id):
+    template = loader.get_template('tasks/get.html')
+    task = TasksModel.objects.get(id=task_id)
+    context = {
+        'task': task,
     }
     return HttpResponse(template.render(context, request))
 

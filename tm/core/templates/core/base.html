@@ -7,33 +7,52 @@
 
 <link rel="stylesheet" type="text/css" href="{% static 'core/style.css' %}">
 
+<style>
+    body {
+        background-color: #E8E873;
+    }
+    .top {
+        font-size: 24px;
+        padding: 30px;
+        margin: 0 0 50px 0;
+        background-color: black;
+    }
+
+    .menu-item {
+        color: white
+    }
+
+    .create:hover {
+        background-color: white;
+    }
+</style>
+
+<div class="top">
+{% block nav %}
+    <ul class="nav">
+        <li class="nav-item">
+            <a class="nav-link menu-item" href="{% url 'tasks:all' %}">ВСЕ</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link menu-item" href="{% url 'tasks:open' %}">Открытые</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link menu-item" href="{% url 'tasks:in_progress' %}">В работе</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link menu-item" href="{% url 'tasks:completed' %}">Выполнено</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link menu-item" href="{% url 'tasks:checked' %}">Проверено</a>
+        </li>
+        <button type="button" class="btn btn-primary create">
+            <a class="nav-link white-font" href="{% url 'tasks:new' %}">СОЗДАТЬ</a>
+        </button>
+    </ul>
+{% endblock nav %}
+</div>
+
 <div class="container">
-
-    {% block nav %}
-    <div class="top">
-        <ul class="nav">
-            <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="">Все</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="open">Открытые</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="in-progress">В работе</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="completed">Выполнено</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="checked">Проверено</a>
-            </li>
-            <button type="button" class="btn btn-danger">
-                <a class="nav-link white-font" href="new">СОЗДАТЬ</a>
-            </button>
-        </ul>
-    </div>
-    {% endblock nav %}
-
     {% block content %}
 
     {% endblock content %}
